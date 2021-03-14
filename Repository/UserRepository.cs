@@ -34,8 +34,7 @@ namespace sucks_bucks_bot.Repository
             CreateConnection();
             var UsersList = new List<User>();
 
-            var com = new SqlCommand("UsersSelect", connection);
-            com.CommandType = CommandType.StoredProcedure;
+            var com = new SqlCommand("UsersSelect", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -65,8 +64,7 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UsersInsert", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("UsersInsert", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);
@@ -75,18 +73,13 @@ namespace sucks_bucks_bot.Repository
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
 
         public bool Update(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UsersUpdate", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("UsersUpdate", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);
@@ -95,11 +88,7 @@ namespace sucks_bucks_bot.Repository
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
     }
 }

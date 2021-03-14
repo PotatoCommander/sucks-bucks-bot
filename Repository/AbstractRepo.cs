@@ -20,11 +20,7 @@ namespace sucks_bucks_bot.Repository
         }
         protected T GetById(int id, List<T> list)
         {
-            foreach (var item in list)
-            {
-                if (item.Id == id) return item;
-            }
-            return null;
+            return list.FirstOrDefault(item => item.Id == id);
         }
     }
 }

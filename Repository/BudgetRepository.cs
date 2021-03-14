@@ -19,10 +19,9 @@ namespace sucks_bucks_bot.Repository
         public List<Budget> GetAll()
         {
             CreateConnection();
-            var BudgetList = new List<Budget>();
+            var budgetList = new List<Budget>();
 
-            var com = new SqlCommand("BudgetSelect", connection);
-            com.CommandType = CommandType.StoredProcedure;
+            var com = new SqlCommand("BudgetSelect", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -32,7 +31,7 @@ namespace sucks_bucks_bot.Repository
    
             foreach (DataRow dr in dataTable.Rows)
             {
-                BudgetList.Add(
+                budgetList.Add(
                     new Budget()
                     {
                         Id = Convert.ToInt32(dr["Id"]),
@@ -45,14 +44,13 @@ namespace sucks_bucks_bot.Repository
                     );
             }
 
-            return BudgetList;
+            return budgetList;
         }
 
         public bool Update(Budget entity)
         { 
             CreateConnection();
-            var command = new SqlCommand("BudgetUpdate", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("BudgetUpdate", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@monthBudget", entity.MonthlyBudget);
@@ -65,18 +63,13 @@ namespace sucks_bucks_bot.Repository
             var result = command.ExecuteNonQuery();
             connection.Close();
 
-            if (result >= 1)
-            {
-                return true;
-            }
-            return false;
+            return result >= 1;
         }
 
         public bool Insert(Budget entity)
         {
             CreateConnection();
-            var command = new SqlCommand("BudgetInsert", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("BudgetInsert", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@monthBudget", entity.MonthlyBudget);
@@ -89,29 +82,20 @@ namespace sucks_bucks_bot.Repository
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
 
         public bool Delete(Budget entity)
         {
             CreateConnection();
-            var com = new SqlCommand("BudgetDelete", connection);
+            var com = new SqlCommand("BudgetDelete", connection) {CommandType = CommandType.StoredProcedure};
 
-            com.CommandType = CommandType.StoredProcedure;
             com.Parameters.AddWithValue("@Id", entity.Id);
 
             connection.Open();
             var result = com.ExecuteNonQuery();
             connection.Close();
-            if (result >= 1)
-            {
-                return true;
-            }
-            return false;
+            return result >= 1;
         }
     }
 }

@@ -14,28 +14,22 @@ namespace sucks_bucks_bot.Repository
         public bool Delete(Expense entity)
         {
             CreateConnection();
-            var com = new SqlCommand("ExpensesDelete", connection);
+            var com = new SqlCommand("ExpensesDelete", connection) {CommandType = CommandType.StoredProcedure};
 
-            com.CommandType = CommandType.StoredProcedure;
             com.Parameters.AddWithValue("@Id", entity.Id);
 
             connection.Open();
             var result = com.ExecuteNonQuery();
             connection.Close();
-            if (result >= 1)
-            {
-                return true;
-            }
-            return false;
+            return result >= 1;
         }
 
         public List<Expense> GetAll()
         {
             CreateConnection();
-            var ExpensesList = new List<Expense>();
+            var expensesList = new List<Expense>();
 
-            var com = new SqlCommand("ExpensesSelect", connection);
-            com.CommandType = CommandType.StoredProcedure;
+            var com = new SqlCommand("ExpensesSelect", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -45,7 +39,7 @@ namespace sucks_bucks_bot.Repository
 
             foreach (DataRow dr in dataTable.Rows)
             {
-                ExpensesList.Add(
+                expensesList.Add(
                     new Expense()
                     {
                         Id = Convert.ToInt32(dr["Id"]),
@@ -53,19 +47,19 @@ namespace sucks_bucks_bot.Repository
                         CreatedTime = Convert.ToDateTime(dr["created"]),
                         CategoryId = Convert.ToInt32(dr["category_Id"]),
                         UserId = Convert.ToInt32(dr["User_Id"]),
-                        nameOfExpense = Convert.ToString(dr["name_of_expense"])
+                        NameOfExpense = Convert.ToString(dr["name_of_expense"])
                     }
                     );
             }
 
-            return ExpensesList;
+            return expensesList;
         }
 
         public Expense GetById(int id)
         {
             return base.GetById(id, GetAll());
         }
-        public List<Expense> GetByCategoryID(int categoryId, List<Expense> list)
+        public List<Expense> GetByCategoryId(int categoryId, List<Expense> list)
         {
             var listToReturn = new List<Expense>();
             foreach (var item in list)
@@ -92,13 +86,13 @@ namespace sucks_bucks_bot.Repository
             }
             return listToReturn;
         }
-        public List<Expense> GetAllOfUser(int UserId)
+        public List<Expense> GetAllOfUser(int userId)
         {
             var listToReturn = new List<Expense>();
             var list = GetAll();
             foreach (var item in list)
             {
-                if (item.UserId == UserId)
+                if (item.UserId == userId)
                 {
                     listToReturn.Add(item);
                 }
@@ -110,49 +104,39 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(Expense entity)
         {
             CreateConnection();
-            var command = new SqlCommand("ExpensesInsert", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("ExpensesInsert", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@amount", entity.Amount);
             command.Parameters.AddWithValue("@created", entity.CreatedTime);
             command.Parameters.AddWithValue("@category_Id", entity.CategoryId);
             command.Parameters.AddWithValue("@User_Id", entity.UserId);
-            command.Parameters.AddWithValue("@name_of_expense", entity.nameOfExpense);
+            command.Parameters.AddWithValue("@name_of_expense", entity.NameOfExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
 
         public bool Update(Expense entity)
         {
             CreateConnection();
-            var command = new SqlCommand("ExpensesUpdate", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("ExpensesUpdate", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@amount", entity.Amount);
             command.Parameters.AddWithValue("@created", entity.CreatedTime);
             command.Parameters.AddWithValue("@category_Id", entity.CategoryId);
             command.Parameters.AddWithValue("@User_Id", entity.UserId);
-            command.Parameters.AddWithValue("@name_of_expense", entity.nameOfExpense);
+            command.Parameters.AddWithValue("@name_of_expense", entity.NameOfExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
     }
 }

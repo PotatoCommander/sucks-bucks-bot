@@ -12,6 +12,6 @@ namespace sucks_bucks_bot.Model
         public DateTime CreatedTime;
         public int CategoryId;
         public int UserId;
-        public string nameOfExpense;
+        public string NameOfExpense;
     }
 }

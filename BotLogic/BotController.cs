@@ -110,7 +110,7 @@ namespace sucks_bucks_bot.BotLogic
 			var exp = ParseMessage(ev.Message.Text, ev.Message.From);
 			expenses.Insert(exp);
 			var cat = categories.GetById(exp.CategoryId);
-			_bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {exp.nameOfExpense}");
+			_bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {exp.NameOfExpense}");
 		}
 		private void GetLastMessage(MessageEventArgs ev)
         {
@@ -119,7 +119,7 @@ namespace sucks_bucks_bot.BotLogic
 			foreach (var item in list)
             {
 				var cat = categories.GetById(item.CategoryId);
-				str = string.Concat(str, item.CreatedTime.ToString() +"  " + item.nameOfExpense +" "
+				str = string.Concat(str, item.CreatedTime.ToString() +"  " + item.NameOfExpense +" "
 					+ cat.CategoryName + " " + item.Amount + " " + "\n");
 			}
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
@@ -131,7 +131,7 @@ namespace sucks_bucks_bot.BotLogic
 			foreach (var item in list)
 			{
 				var cat = categories.GetById(item.CategoryId);
-				str = string.Concat(str, item.CreatedTime.ToString() + "  " + item.nameOfExpense + " "
+				str = string.Concat(str, item.CreatedTime + "  " + item.NameOfExpense + " "
 					+ cat.CategoryName + " " + item.Amount + " " + "\n");
 			}
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
@@ -144,39 +144,37 @@ namespace sucks_bucks_bot.BotLogic
 			var total = 0;
 			foreach (var item in cats)
             {
-				var listOfExpenses = expenses.GetByCategoryID(item.Id, list);
-				if (listOfExpenses.Count > 0)
-				{
-					str = string.Concat(str, "Kатегория: [" + item.CategoryName + "]\n");
-					int sum = 0;
-					foreach (var expense in listOfExpenses)
-					{
-						sum += expense.Amount;
-						str = string.Concat(str, expense.CreatedTime.ToString() + "  " + expense.nameOfExpense + " " + expense.Amount + "р " + "\n");
-					}
-					total += sum;
-					str = string.Concat(str, "Расходов в категории [" + item.CategoryName + "] " + sum + "р \n\n");
-				}
-			}
+				var listOfExpenses = expenses.GetByCategoryId(item.Id, list);
+                if (listOfExpenses.Count <= 0) continue;
+                str = string.Concat(str, "Kатегория: [" + item.CategoryName + "]\n");
+                int sum = 0;
+                foreach (var expense in listOfExpenses)
+                {
+                    sum += expense.Amount;
+                    str = string.Concat(str, expense.CreatedTime + "  " + expense.NameOfExpense + " " + expense.Amount + "р " + "\n");
+                }
+                total += sum;
+                str = string.Concat(str, "Расходов в категории [" + item.CategoryName + "] " + sum + "р \n\n");
+            }
 			str = string.Concat(str, "Расходов всего." + total + "р \n\n");
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
 		}
 		private Expense ParseMessage(string str, Telegram.Bot.Types.User user)
 		{
 			var input = Regex.Replace(str, @"\s+", "");
-			string digits = Regex.Match(input, @"^\d+").Value;
-			string category = Regex.Match(input, @"\D+").Value;
+			var digits = Regex.Match(input, @"^\d+").Value;
+			var category = Regex.Match(input, @"\D+").Value;
 			var money = Convert.ToInt32(digits);
 
-			var findedCategory = categories.GetByString(category);
+			var foundedCategory = categories.GetByString(category);
 			return (new Expense()
 			{
 				Amount = money,
 				CreatedTime = DateTime.Now,
-				CategoryId = findedCategory.Id,
+				CategoryId = foundedCategory.Id,
 				Id = Guid.NewGuid().GetHashCode(),
 				UserId = user.Id,
-				nameOfExpense = category
+				NameOfExpense = category
 			});
 		}
 
@@ -189,7 +187,7 @@ namespace sucks_bucks_bot.BotLogic
 				{
 					CategoryName = item.categoryName,
 					Aliases = item.aliases,
-					isBaseExpense = item.isBaseExpense,
+					IsBaseExpense = item.isBaseExpense,
 					Id = Guid.NewGuid().GetHashCode()
 				});
 			}
@@ -216,8 +214,7 @@ namespace sucks_bucks_bot.BotLogic
 		}
 		private bool InitUser(MessageEventArgs ev)
 		{
-			var use = ev.Message.From;
-			try
+            try
 			{
 				users.Insert(new User() { Id = ev.Message.From.Id, Username = ev.Message.From.FirstName });
 				return true;
@@ -227,9 +224,5 @@ namespace sucks_bucks_bot.BotLogic
 				return false;
 			}
 		}
-		//private int getAmountAndCategory(out string str)
-		//{
-
-		//}
-	}
+    }
 }

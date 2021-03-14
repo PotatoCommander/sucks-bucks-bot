@@ -37,10 +37,9 @@ namespace sucks_bucks_bot.Repository
         public List<Category> GetAll()
         {
             CreateConnection();
-            var CategoryList = new List<Category>();
+            var categoryList = new List<Category>();
 
-            var com = new SqlCommand("CategorySelect", connection);
-            com.CommandType = CommandType.StoredProcedure;
+            var com = new SqlCommand("CategorySelect", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -50,79 +49,65 @@ namespace sucks_bucks_bot.Repository
 
             foreach (DataRow dr in dataTable.Rows)
             {
-                CategoryList.Add(
+                categoryList.Add(
                     new Category()
                     {
                         Id = Convert.ToInt32(dr["Id"]),
                         CategoryName = Convert.ToString(dr["category_name"]),
                         Aliases = Convert.ToString(dr["aliases"]),
-                        isBaseExpense = Convert.ToBoolean(dr["isBaseExpense"])
+                        IsBaseExpense = Convert.ToBoolean(dr["IsBaseExpense"])
                     }
                     );
             }
 
-            return CategoryList;
+            return categoryList;
         }
 
         public bool Insert(Category entity)
         {
             CreateConnection();
-            var command = new SqlCommand("CategoryInsert", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("CategoryInsert", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@categoryName", entity.CategoryName);
             command.Parameters.AddWithValue("@aliases", entity.Aliases);
-            command.Parameters.AddWithValue("@isBaseExpense", entity.isBaseExpense);
+            command.Parameters.AddWithValue("@IsBaseExpense", entity.IsBaseExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
 
         public bool Update(Category entity)
         {
             CreateConnection();
-            var command = new SqlCommand("CategoryUpdate", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            var command = new SqlCommand("CategoryUpdate", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@categoryName", entity.CategoryName);
             command.Parameters.AddWithValue("@aliases", entity.Aliases);
-            command.Parameters.AddWithValue("@isBaseExpense", entity.isBaseExpense);
+            command.Parameters.AddWithValue("@IsBaseExpense", entity.IsBaseExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
             connection.Close();
 
-            if (i >= 1)
-            {
-                return true;
-            }
-            return false;
+            return i >= 1;
         }
         public bool Delete(Category entity)
         {
             CreateConnection();
-            var com = new SqlCommand("CategoryDelete", connection);
+            var com = new SqlCommand("CategoryDelete", connection) {CommandType = CommandType.StoredProcedure};
 
-            com.CommandType = CommandType.StoredProcedure;
             com.Parameters.AddWithValue("@Id", entity.Id);
 
             connection.Open();
             var result = com.ExecuteNonQuery();
             connection.Close();
-            if (result >= 1)
-            {
-                return true;
-            }
-            return false;
+
+            return result >= 1;
         }
     }
 }

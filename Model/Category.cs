@@ -10,6 +10,6 @@ namespace sucks_bucks_bot.Model
     {
         public string CategoryName;
         public string Aliases;
-        public bool isBaseExpense;
+        public bool IsBaseExpense;
     }
 }
