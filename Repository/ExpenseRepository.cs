@@ -60,7 +60,7 @@ namespace sucks_bucks_bot.Repository
             return ExpensesList;
         }
 
-        public Entity GetById(int id)
+        public Expense GetById(int id)
         {
             return base.GetById(id, GetAll());
         }

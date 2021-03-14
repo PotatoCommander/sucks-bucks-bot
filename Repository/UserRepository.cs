@@ -57,7 +57,7 @@ namespace sucks_bucks_bot.Repository
             return UsersList;
         }
 
-        public Entity GetById(int id)
+        public User GetById(int id)
         {
             return base.GetById(id, GetAll());
         }

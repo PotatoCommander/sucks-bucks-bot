@@ -11,9 +11,28 @@ namespace sucks_bucks_bot.Repository
 {
     class CategoryRepository : AbstractRepo<Category>, IRepository<Category>
     {
-        public Entity GetById(int id)
+        public  void CategoryUpdate(List<Category> categories)
+        {
+            foreach(var category in categories)
+            {
+                Insert(category);
+            }
+        }
+        public Category GetById(int id)
         {
             return base.GetById(id, GetAll());
+        }
+        public Category GetByString(string str)
+        {
+            var list = GetAll();
+            foreach (var item in list)
+            {
+                if (item.Aliases.Contains(str))
+                {
+                    return item;
+                }
+            }
+            return GetByString("OTHER");
         }
         public List<Category> GetAll()
         {

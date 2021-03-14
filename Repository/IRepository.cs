@@ -9,7 +9,7 @@ namespace sucks_bucks_bot.Repository
 {
     interface IRepository<T> where T: Entity
     {
-        Entity GetById(int id);
+        T GetById(int id);
         List<T> GetAll();
         bool Update(T entity);
         bool Insert(T entity);

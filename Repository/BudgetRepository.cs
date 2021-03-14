@@ -11,7 +11,7 @@ namespace sucks_bucks_bot.Repository
 {
     class BudgetRepository: AbstractRepo<Budget>, IRepository<Budget>
     {
-        public Entity GetById(int id)
+        public Budget GetById(int id)
         {
             return base.GetById(id, GetAll());
         }
