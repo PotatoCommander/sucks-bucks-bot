@@ -14,9 +14,8 @@ namespace sucks_bucks_bot.Repository
         public bool Delete(User entity)
         {
             CreateConnection();
-            var com = new SqlCommand("UsersDelete", connection);
+            var com = new SqlCommand("UsersDelete", connection) {CommandType = CommandType.StoredProcedure};
 
-            com.CommandType = CommandType.StoredProcedure;
             com.Parameters.AddWithValue("@Id", entity.Id);
 
             connection.Open();

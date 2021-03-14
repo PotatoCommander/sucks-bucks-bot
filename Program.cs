@@ -8,7 +8,7 @@ using sucks_bucks_bot.Repository;
 
 namespace sucks_bucks_bot
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {

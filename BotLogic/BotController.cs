@@ -21,7 +21,7 @@ namespace sucks_bucks_bot.BotLogic
 	}
 	class BotController
 	{
-		private List<string> commands = new List<string>()
+		private readonly List<string> commands = new List<string>()
 		{
 			"/start - Стартовое меню",
 			"/getlast - Получить 10 последних расходов",
@@ -31,9 +31,9 @@ namespace sucks_bucks_bot.BotLogic
 		};
 		const string token = "1658228507:AAEF11ujKdslj3MLs-opP-2vKWQMJCiO79M";
 		ITelegramBotClient _bot;
-		private string fileName = @"C:\Jsones\CATS.json";
+        private const string fileName = @"C:\Jsones\CATS.json";
 
-		BudgetRepository budgetes;
+        BudgetRepository budgetes;
 		CategoryRepository categories;
 		ExpenseRepository expenses;
 		UserRepository users;
@@ -93,7 +93,7 @@ namespace sucks_bucks_bot.BotLogic
 
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, "Вас приветсвует чат бот для учета расходов!\n" +
 				"Вот список команд:");
-			string list = "";
+			var list = "";
 			foreach (var str in commands)
 			{
 				list = string.Concat(list, str + "\n\n");
@@ -108,9 +108,8 @@ namespace sucks_bucks_bot.BotLogic
 		private void AddingExpenseMessage(MessageEventArgs ev)
         {
 			var exp = ParseMessage(ev.Message.Text, ev.Message.From);
-			expenses.Insert(exp);
-			var cat = categories.GetById(exp.CategoryId);
-			_bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {exp.NameOfExpense}");
+            expenses.Insert(exp);
+            _bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {exp.NameOfExpense}");
 		}
 		private void GetLastMessage(MessageEventArgs ev)
         {
@@ -119,7 +118,7 @@ namespace sucks_bucks_bot.BotLogic
 			foreach (var item in list)
             {
 				var cat = categories.GetById(item.CategoryId);
-				str = string.Concat(str, item.CreatedTime.ToString() +"  " + item.NameOfExpense +" "
+				str = string.Concat(str, item.CreatedTime +"  " + item.NameOfExpense +" "
 					+ cat.CategoryName + " " + item.Amount + " " + "\n");
 			}
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
@@ -147,7 +146,7 @@ namespace sucks_bucks_bot.BotLogic
 				var listOfExpenses = expenses.GetByCategoryId(item.Id, list);
                 if (listOfExpenses.Count <= 0) continue;
                 str = string.Concat(str, "Kатегория: [" + item.CategoryName + "]\n");
-                int sum = 0;
+                var sum = 0;
                 foreach (var expense in listOfExpenses)
                 {
                     sum += expense.Amount;
