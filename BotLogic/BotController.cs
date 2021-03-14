@@ -23,10 +23,10 @@ namespace sucks_bucks_bot.BotLogic
 	{
 		private List<string> commands = new List<string>()
 		{
-			"/start",
-			"/getlast",
-			"/getall",
-			"/bycategory"
+			"/start - Стартовое меню",
+			"/getlast - Получить 10 последних расходов",
+			"/getall - Получить все расходы.",
+			"/bycategory - Сумма расходов по категориям за месяц."
 
 		};
 		const string token = "1658228507:AAEF11ujKdslj3MLs-opP-2vKWQMJCiO79M";
@@ -50,31 +50,33 @@ namespace sucks_bucks_bot.BotLogic
 			users = new UserRepository();
 
 			_bot = new TelegramBotClient(token) { Timeout = TimeSpan.FromSeconds(60) };
+			//_bot.GetUpdatesAsync();
+			//_bot.StopReceiving();
 			ParseJson();
 			_bot.OnMessage += MessageOnGet;
 			_bot.StartReceiving();
 		}
 		public void MessageOnGet(object sender, MessageEventArgs ev)
 		{
+			if (users.GetById(ev.Message.From.Id) == null) InitUser(ev);
 			switch (ev.Message.Text?.ToLowerInvariant())
 			{
 				case "/start":
 					StartMessage(ev);
 					break;
 				case "/getlast":
+					GetLastMessage(ev);
 					break;
 				case "/getall":
+					GetAllMessage(ev);
 					break;
 				case "/bycategory":
+					GetByCategoryMessage(ev);
 					break;
 				default:
 					if (isExpenseString(ev.Message.Text))
 					{
-						var exp = ParseMessage(ev.Message.Text, ev.Message.From);
-						expenses.Insert(exp);
-						var cat = categories.GetById(exp.CategoryId);
-						_bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {cat.CategoryName}");
-
+						AddingExpenseMessage(ev);
 					}
 					else
 					{
@@ -87,7 +89,7 @@ namespace sucks_bucks_bot.BotLogic
 		}
 		private void StartMessage(MessageEventArgs ev)
 		{
-			InitUser(ev);
+			//InitUser(ev);
 
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, "Вас приветсвует чат бот для учета расходов!\n" +
 				"Вот список команд:");
@@ -103,9 +105,61 @@ namespace sucks_bucks_bot.BotLogic
 		{
 			_bot.SendTextMessageAsync(ev.Message.Chat.Id, "Это не похоже на строку расходов или команду :(");
 		}
-		private void AddExpense(MessageEventArgs ev)
-		{
-
+		private void AddingExpenseMessage(MessageEventArgs ev)
+        {
+			var exp = ParseMessage(ev.Message.Text, ev.Message.From);
+			expenses.Insert(exp);
+			var cat = categories.GetById(exp.CategoryId);
+			_bot.SendTextMessageAsync(ev.Message.Chat.Id, $"Добавлен расход {exp.Amount}руб в категорию {exp.nameOfExpense}");
+		}
+		private void GetLastMessage(MessageEventArgs ev)
+        {
+			var list = expenses.GetFirstByTime(10, expenses.GetAllOfUser(ev.Message.From.Id));
+			var str = "Последние 10 расходов:\n";
+			foreach (var item in list)
+            {
+				var cat = categories.GetById(item.CategoryId);
+				str = string.Concat(str, item.CreatedTime.ToString() +"  " + item.nameOfExpense +" "
+					+ cat.CategoryName + " " + item.Amount + " " + "\n");
+			}
+			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
+		}
+		private void GetAllMessage(MessageEventArgs ev)
+        {
+			var list = expenses.GetAllOfUser(ev.Message.From.Id);
+			var str = "Все расходы:\n";
+			foreach (var item in list)
+			{
+				var cat = categories.GetById(item.CategoryId);
+				str = string.Concat(str, item.CreatedTime.ToString() + "  " + item.nameOfExpense + " "
+					+ cat.CategoryName + " " + item.Amount + " " + "\n");
+			}
+			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
+		}
+		private void GetByCategoryMessage(MessageEventArgs ev)
+        {
+			var list = expenses.GetAllOfUser(ev.Message.From.Id);
+			var cats = categories.GetAll();
+			var str = "";
+			var total = 0;
+			foreach (var item in cats)
+            {
+				var listOfExpenses = expenses.GetByCategoryID(item.Id, list);
+				if (listOfExpenses.Count > 0)
+				{
+					str = string.Concat(str, "Kатегория: [" + item.CategoryName + "]\n");
+					int sum = 0;
+					foreach (var expense in listOfExpenses)
+					{
+						sum += expense.Amount;
+						str = string.Concat(str, expense.CreatedTime.ToString() + "  " + expense.nameOfExpense + " " + expense.Amount + "р " + "\n");
+					}
+					total += sum;
+					str = string.Concat(str, "Расходов в категории [" + item.CategoryName + "] " + sum + "р \n\n");
+				}
+			}
+			str = string.Concat(str, "Расходов всего." + total + "р \n\n");
+			_bot.SendTextMessageAsync(ev.Message.Chat.Id, str);
 		}
 		private Expense ParseMessage(string str, Telegram.Bot.Types.User user)
 		{
@@ -115,13 +169,14 @@ namespace sucks_bucks_bot.BotLogic
 			var money = Convert.ToInt32(digits);
 
 			var findedCategory = categories.GetByString(category);
-			return (new Expense() 
+			return (new Expense()
 			{
-					Amount = money,
-					CreatedTime = DateTime.Now,
-					CategoryId = findedCategory.Id,
-					Id = Guid.NewGuid().GetHashCode(),
-					UserId = user.Id
+				Amount = money,
+				CreatedTime = DateTime.Now,
+				CategoryId = findedCategory.Id,
+				Id = Guid.NewGuid().GetHashCode(),
+				UserId = user.Id,
+				nameOfExpense = category
 			});
 		}
 
@@ -161,9 +216,10 @@ namespace sucks_bucks_bot.BotLogic
 		}
 		private bool InitUser(MessageEventArgs ev)
 		{
+			var use = ev.Message.From;
 			try
 			{
-				users.Insert(new User() { Id = ev.Message.From.Id, Username = ev.Message.From.Username });
+				users.Insert(new User() { Id = ev.Message.From.Id, Username = ev.Message.From.FirstName });
 				return true;
 			}
 			catch

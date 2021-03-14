@@ -52,7 +52,8 @@ namespace sucks_bucks_bot.Repository
                         Amount = Convert.ToInt32(dr["amount"]),
                         CreatedTime = Convert.ToDateTime(dr["created"]),
                         CategoryId = Convert.ToInt32(dr["category_Id"]),
-                        UserId = Convert.ToInt32(dr["User_Id"])
+                        UserId = Convert.ToInt32(dr["User_Id"]),
+                        nameOfExpense = Convert.ToString(dr["name_of_expense"])
                     }
                     );
             }
@@ -63,6 +64,47 @@ namespace sucks_bucks_bot.Repository
         public Expense GetById(int id)
         {
             return base.GetById(id, GetAll());
+        }
+        public List<Expense> GetByCategoryID(int categoryId, List<Expense> list)
+        {
+            var listToReturn = new List<Expense>();
+            foreach (var item in list)
+            {
+                if (item.CategoryId == categoryId)
+                {
+                    listToReturn.Add(item);
+                }
+            }
+            return listToReturn;
+        }
+
+        public List<Expense> GetFirstByTime(int number, List<Expense> list)
+        {
+            var listToReturn = new List<Expense>();
+            list = (list.OrderBy(x => x.CreatedTime).ToList());
+            if (number > list.Count)
+            {
+                number = list.Count;
+            }
+            for (var i = 0; i < number; i++)
+            {
+                listToReturn.Add(list[i]);
+            }
+            return listToReturn;
+        }
+        public List<Expense> GetAllOfUser(int UserId)
+        {
+            var listToReturn = new List<Expense>();
+            var list = GetAll();
+            foreach (var item in list)
+            {
+                if (item.UserId == UserId)
+                {
+                    listToReturn.Add(item);
+                }
+            }
+            listToReturn = (listToReturn.OrderBy(x => x.CreatedTime).ToList());
+            return listToReturn;
         }
 
         public bool Insert(Expense entity)
@@ -76,6 +118,7 @@ namespace sucks_bucks_bot.Repository
             command.Parameters.AddWithValue("@created", entity.CreatedTime);
             command.Parameters.AddWithValue("@category_Id", entity.CategoryId);
             command.Parameters.AddWithValue("@User_Id", entity.UserId);
+            command.Parameters.AddWithValue("@name_of_expense", entity.nameOfExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
@@ -99,6 +142,7 @@ namespace sucks_bucks_bot.Repository
             command.Parameters.AddWithValue("@created", entity.CreatedTime);
             command.Parameters.AddWithValue("@category_Id", entity.CategoryId);
             command.Parameters.AddWithValue("@User_Id", entity.UserId);
+            command.Parameters.AddWithValue("@name_of_expense", entity.nameOfExpense);
 
             connection.Open();
             var i = command.ExecuteNonQuery();
