@@ -7,20 +7,20 @@ using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository.CategoryRepos
 {
-    public class ExpenseCategoryRepository : AbstractRepo<ExpenseCategory>, IRepository<ExpenseCategory>
+    public class IncomeCategoryRepository: AbstractRepo<IncomeCategory>, IRepository<IncomeCategory>
     {
-        public  void CategoryUpdate(List<ExpenseCategory> categories)
+        public  void CategoryUpdate(List<IncomeCategory> categories)
         {
-            foreach(var category in categories)
+            foreach(IncomeCategory category in categories)
             {
                 Insert(category);
             }
         }
-        public ExpenseCategory GetById(int? id)
+        public IncomeCategory GetById(int? id)
         {
             return base.GetById(id, GetAll());
         }
-        public ExpenseCategory GetByString(string str)
+        public IncomeCategory GetByString(string str)
         {
             var list = GetAll();
             foreach (var item in list)
@@ -32,12 +32,12 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             }
             return GetByString("OTHER");
         }
-        public List<ExpenseCategory> GetAll()
+        public List<IncomeCategory> GetAll()
         {
             CreateConnection();
-            var categoryList = new List<ExpenseCategory>();
+            var categoryList = new List<IncomeCategory>();
 
-            var com = new SqlCommand("SelectAllExpenseCategories", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllIncomeCategories", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -48,12 +48,11 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             foreach (DataRow dr in dataTable.Rows)
             {
                 categoryList.Add(
-                    new ExpenseCategory
+                    new IncomeCategory
                     {
                         Id = Convert.ToInt32(dr["Id"]),
                         CategoryName = Convert.ToString(dr["CategoryName"]),
                         Aliases = Convert.ToString(dr["Aliases"]),
-                        IsBaseExpense = Convert.ToBoolean(dr["IsBaseExpense"]),
                         UserId = Convert.IsDBNull(dr["UserId"])? null :(Convert.ToInt32(dr["UserId"]))
                     }
                     );
@@ -62,10 +61,10 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             return categoryList;
         }
 
-        public bool Insert(ExpenseCategory entity)
+        public bool Insert(IncomeCategory entity)
         {
             CreateConnection();
-            var command = new SqlCommand("InsertExpenseCategory", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertIncomeCategory", connection) {CommandType = CommandType.StoredProcedure};
 
             AddCommandParameters(command, entity);
 
@@ -76,10 +75,10 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             return i >= 1;
         }
 
-        public bool Update(ExpenseCategory entity)
+        public bool Update(IncomeCategory entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UpdateExpenseCategories", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateIncomeCategories", connection) {CommandType = CommandType.StoredProcedure};
             
             AddCommandParameters(command, entity);
             
@@ -89,10 +88,10 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
 
             return i >= 1;
         }
-        public bool Delete(ExpenseCategory entity)
+        public bool Delete(IncomeCategory entity)
         {
             CreateConnection();
-            var com = new SqlCommand("DeleteExpenseCategoryById", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteIncomeCategoryById", connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
@@ -103,12 +102,16 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             return result >= 1;
         }
 
-        private void AddCommandParameters(SqlCommand command, ExpenseCategory entity)
+        private void CreateCommand(string NameOfCooma)
+        {
+            
+        }
+
+        private void AddCommandParameters(SqlCommand command, IncomeCategory entity)
         {
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@CategoryName", entity.CategoryName);
             command.Parameters.AddWithValue("@Aliases", entity.Aliases);
-            command.Parameters.AddWithValue("@IsBaseExpense", entity.IsBaseExpense);
             command.Parameters.AddWithValue("@UserId", entity.UserId);
         }
     }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace sucks_bucks_bot.Model
+﻿namespace sucks_bucks_bot.Model
 {
-    class Expense: Transaction
+    public class Expense: Transaction
     {
-        public int CategoryId;
+        public int CategoryId ;
+        public override string ToString()
+        {
+            return $"\U0000274c{Amount} {Definition} {CreatedTime.ToShortDateString()}" +
+                   $" {CreatedTime.ToShortTimeString()}";
+        }
     }
 }

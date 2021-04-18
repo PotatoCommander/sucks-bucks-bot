@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using sucks_bucks_bot.Model;
+using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository
 {
-    class BudgetRepository: AbstractRepo<Budget>, IRepository<Budget>
+    public class BudgetRepository: AbstractRepo<Budget>, IRepository<Budget>
     {
-        public Budget GetById(int id)
+        public Budget GetById(int? id)
         {
             return base.GetById(id, GetAll());
         }
@@ -21,7 +22,7 @@ namespace sucks_bucks_bot.Repository
             CreateConnection();
             var budgetList = new List<Budget>();
 
-            var com = new SqlCommand("BudgetSelect", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllBudgets", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -50,7 +51,7 @@ namespace sucks_bucks_bot.Repository
         public bool Update(Budget entity)
         { 
             CreateConnection();
-            var command = new SqlCommand("BudgetUpdate", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateBudget", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@monthBudget", entity.MonthlyBudget);
@@ -69,7 +70,7 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(Budget entity)
         {
             CreateConnection();
-            var command = new SqlCommand("BudgetInsert", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertBudget", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@monthBudget", entity.MonthlyBudget);
@@ -88,7 +89,7 @@ namespace sucks_bucks_bot.Repository
         public bool Delete(Budget entity)
         {
             CreateConnection();
-            var com = new SqlCommand("BudgetDelete", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteBudgetById", connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 

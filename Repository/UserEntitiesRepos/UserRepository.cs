@@ -6,15 +6,16 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository
 {
-    class UserRepository : AbstractRepo<User>, IRepository<User>
+    public class UserRepository : AbstractRepo<User>, IRepository<User>
     {
         public bool Delete(User entity)
         {
             CreateConnection();
-            var com = new SqlCommand("UsersDelete", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteUserById", connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
@@ -33,7 +34,7 @@ namespace sucks_bucks_bot.Repository
             CreateConnection();
             var UsersList = new List<User>();
 
-            var com = new SqlCommand("UsersSelect", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllUsers", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -55,7 +56,7 @@ namespace sucks_bucks_bot.Repository
             return UsersList;
         }
 
-        public User GetById(int id)
+        public User GetById(int? id)
         {
             return base.GetById(id, GetAll());
         }
@@ -63,7 +64,7 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UsersInsert", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertUser", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);
@@ -78,7 +79,7 @@ namespace sucks_bucks_bot.Repository
         public bool Update(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UsersUpdate", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateUser", connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);

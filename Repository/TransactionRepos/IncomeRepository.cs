@@ -1,21 +1,19 @@
-﻿using sucks_bucks_bot.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using sucks_bucks_bot.Model;
 using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository
 {
-    public class ExpenseRepository : AbstractRepo<Expense>, IRepository<Expense>
+    public class IncomeRepository: AbstractRepo<Income>, IRepository<Income>
     {
-        public bool Delete(Expense entity)
+        public bool Delete(Income entity)
         {
             CreateConnection();
-            var com = new SqlCommand("DeleteExpenseById", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteIncomeById", connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
@@ -26,12 +24,12 @@ namespace sucks_bucks_bot.Repository
         }
         
 
-        public List<Expense> GetAll()
+        public List<Income> GetAll()
         {
             CreateConnection();
-            var expensesList = new List<Expense>();
+            var expensesList = new List<Income>();
 
-            var com = new SqlCommand("SelectAllExpenses", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllIncomes", connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
@@ -42,14 +40,15 @@ namespace sucks_bucks_bot.Repository
             foreach (DataRow dr in dataTable.Rows)
             {
                 expensesList.Add(
-                    new Expense()
+                    new Income()
                     {
                         Id = Convert.ToInt32(dr["Id"]),
                         Amount = (float) Convert.ToDouble(dr["Amount"]),
                         CreatedTime = Convert.ToDateTime(dr["CreatedTime"]),
                         CategoryId = Convert.ToInt32(dr["CategoryId"]),
                         UserId = Convert.ToInt32(dr["UserId"]),
-                        Definition = Convert.ToString(dr["Definition"])
+                        Definition = Convert.ToString(dr["Definition"]),
+                        ExpiresAt = Convert.ToDateTime(dr["ExpiresAt"])
                     }
                     );
             }
@@ -57,13 +56,13 @@ namespace sucks_bucks_bot.Repository
             return expensesList;
         }
 
-        public Expense GetById(int? id)
+        public Income GetById(int? id)
         {
             return base.GetById(id, GetAll());
         }
-        public List<Expense> GetByCategoryId(int categoryId, List<Expense> list)
+        public List<Income> GetByCategoryId(int categoryId, List<Income> list)
         {
-            var listToReturn = new List<Expense>();
+            var listToReturn = new List<Income>();
             foreach (var item in list)
             {
                 if (item.CategoryId == categoryId)
@@ -74,9 +73,9 @@ namespace sucks_bucks_bot.Repository
             return listToReturn;
         }
 
-        public List<Expense> GetFirstByTime(int number, List<Expense> list)
+        public List<Income> GetFirstByTime(int number, List<Income> list)
         {
-            var listToReturn = new List<Expense>();
+            var listToReturn = new List<Income>();
             list = (list.OrderByDescending(x => x.CreatedTime).ToList());
             if (number > list.Count)
             {
@@ -88,7 +87,7 @@ namespace sucks_bucks_bot.Repository
             }
             return listToReturn;
         }
-        public List<Expense> GetAllExpensesOfUser(int userId)
+        public List<Income> GetAllExpensesOfUser(int userId)
         {
             var list = GetAll();
             var listToReturn = list.Where(item => item.UserId == userId).ToList();
@@ -96,29 +95,10 @@ namespace sucks_bucks_bot.Repository
             return listToReturn;
         }
 
-        public bool Insert(Expense entity)
+        public bool Insert(Income entity)
         {
             CreateConnection();
-            var command = new SqlCommand("InsertExpense", connection) {CommandType = CommandType.StoredProcedure};
-
-            command.Parameters.AddWithValue("@Id", entity.Id);
-            command.Parameters.AddWithValue("@Amount", entity.Amount);
-            command.Parameters.AddWithValue("@CreatedTime", entity.CreatedTime);
-            command.Parameters.AddWithValue("@UserId", entity.UserId);
-            command.Parameters.AddWithValue("@Definition", entity.Definition);
-            command.Parameters.AddWithValue("@CategoryId", entity.CategoryId);
-
-            connection.Open();
-            var i = command.ExecuteNonQuery();
-            connection.Close();
-
-            return i >= 1;
-        }
-
-        public bool Update(Expense entity)
-        {
-            CreateConnection();
-            var command = new SqlCommand("UpdateExpense", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertIncome", connection) {CommandType = CommandType.StoredProcedure};
 
             AddCommandParameters(command, entity);
 
@@ -129,7 +109,21 @@ namespace sucks_bucks_bot.Repository
             return i >= 1;
         }
 
-        private void AddCommandParameters(SqlCommand command, Expense entity)
+        public bool Update(Income entity)
+        {
+            CreateConnection();
+            var command = new SqlCommand("UpdateIncome", connection) {CommandType = CommandType.StoredProcedure};
+
+            AddCommandParameters(command, entity);
+
+            connection.Open();
+            var i = command.ExecuteNonQuery();
+            connection.Close();
+
+            return i >= 1;
+        }
+
+        private void AddCommandParameters(SqlCommand command, Income entity)
         {
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@Amount", entity.Amount);
@@ -137,6 +131,7 @@ namespace sucks_bucks_bot.Repository
             command.Parameters.AddWithValue("@UserId", entity.UserId);
             command.Parameters.AddWithValue("@Definition", entity.Definition);
             command.Parameters.AddWithValue("@CategoryId", entity.CategoryId);
+            command.Parameters.AddWithValue(@"ExpiresAt", entity.ExpiresAt);
         }
     }
 }

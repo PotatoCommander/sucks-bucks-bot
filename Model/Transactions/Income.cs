@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace sucks_bucks_bot.Model
 {
-    class Income: Transaction
+    public class Income: Transaction
     {
         public int CategoryId;
         public DateTime ExpiresAt;
+        public override string ToString()
+        {
+            return $"\U00002795 {Amount} {Definition} созд: {CreatedTime} истекает: {ExpiresAt}";
+        }
     }
 }

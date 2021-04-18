@@ -1,24 +1,21 @@
-﻿using sucks_bucks_bot.Model;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using sucks_bucks_bot.Model;
 
-namespace sucks_bucks_bot.Repository
+namespace sucks_bucks_bot.Repository.Abstractions
 {
-    abstract class AbstractRepo<T> where T: Entity
+    public abstract class AbstractRepo<T> where T: Entity
     {
         protected SqlConnection connection;
-        protected string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=C:\USERS\LENOVO\SOURCE\REPOS\SUCKS-BUCKS-BOT\SBBOTDB.MDF;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        protected string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SBB_DB;Integrated Security=True";
 
         protected void CreateConnection()
         {
             var constr = connectionString;
             connection = new SqlConnection(constr);
         }
-        protected T GetById(int id, List<T> list)
+        protected T GetById(int? id, List<T> list)
         {
             return list.FirstOrDefault(item => item.Id == id);
         }
