@@ -10,18 +10,18 @@ using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository
 {
-    public class UserRepository : AbstractRepo<User>, IRepository<User>
+    public class UserRepository : AbstractRepo<User>, IGenericRepository<User>
     {
         public bool Delete(User entity)
         {
             CreateConnection();
-            var com = new SqlCommand("DeleteUserById", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteUserById", Connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
-            connection.Open();
+            Connection.Open();
             var result = com.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
             if (result >= 1)
             {
                 return true;
@@ -32,19 +32,19 @@ namespace sucks_bucks_bot.Repository
         public List<User> GetAll()
         {
             CreateConnection();
-            var UsersList = new List<User>();
+            var usersList = new List<User>();
 
-            var com = new SqlCommand("SelectAllUsers", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllUsers", Connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
-            connection.Open();
+            Connection.Open();
             dataAdapter.Fill(dataTable);
-            connection.Close();
+            Connection.Close();
 
             foreach (DataRow dr in dataTable.Rows)
             {
-                UsersList.Add(
+                usersList.Add(
                     new User()
                     {
                         Id = Convert.ToInt32(dr["Id"]),
@@ -53,7 +53,7 @@ namespace sucks_bucks_bot.Repository
                     );
             }
 
-            return UsersList;
+            return usersList;
         }
 
         public User GetById(int? id)
@@ -64,14 +64,14 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("InsertUser", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertUser", Connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);
 
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }
@@ -79,14 +79,14 @@ namespace sucks_bucks_bot.Repository
         public bool Update(User entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UpdateUser", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateUser", Connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@username", entity.Username);
 
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }

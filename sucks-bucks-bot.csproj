@@ -12,6 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BotLogic\Messages\ChainedMessages" />
+    <Folder Include="BotLogic\Actions\ChainedActions" />
     <Folder Include="Model\Enums" />
   </ItemGroup></Project>

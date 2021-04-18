@@ -10,18 +10,18 @@ using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository
 {
-    public class ExpenseRepository : AbstractRepo<Expense>, IRepository<Expense>
+    public class ExpenseRepository : AbstractRepo<Expense>, IGenericRepository<Expense>
     {
         public bool Delete(Expense entity)
         {
             CreateConnection();
-            var com = new SqlCommand("DeleteExpenseById", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteExpenseById", Connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
-            connection.Open();
+            Connection.Open();
             var result = com.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
             return result >= 1;
         }
         
@@ -31,13 +31,13 @@ namespace sucks_bucks_bot.Repository
             CreateConnection();
             var expensesList = new List<Expense>();
 
-            var com = new SqlCommand("SelectAllExpenses", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllExpenses", Connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
-            connection.Open();
+            Connection.Open();
             dataAdapter.Fill(dataTable);
-            connection.Close();
+            Connection.Close();
 
             foreach (DataRow dr in dataTable.Rows)
             {
@@ -99,7 +99,7 @@ namespace sucks_bucks_bot.Repository
         public bool Insert(Expense entity)
         {
             CreateConnection();
-            var command = new SqlCommand("InsertExpense", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertExpense", Connection) {CommandType = CommandType.StoredProcedure};
 
             command.Parameters.AddWithValue("@Id", entity.Id);
             command.Parameters.AddWithValue("@Amount", entity.Amount);
@@ -108,9 +108,9 @@ namespace sucks_bucks_bot.Repository
             command.Parameters.AddWithValue("@Definition", entity.Definition);
             command.Parameters.AddWithValue("@CategoryId", entity.CategoryId);
 
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }
@@ -118,13 +118,13 @@ namespace sucks_bucks_bot.Repository
         public bool Update(Expense entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UpdateExpense", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateExpense", Connection) {CommandType = CommandType.StoredProcedure};
 
             AddCommandParameters(command, entity);
 
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }

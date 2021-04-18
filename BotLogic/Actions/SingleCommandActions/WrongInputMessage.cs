@@ -1,12 +1,13 @@
 ﻿using sucks_bucks_bot.BotLogic.Messages.Abstract;
+using sucks_bucks_bot.Model;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
 namespace sucks_bucks_bot.BotLogic.Messages
 {
-    public class WrongInputMessage: IAction
+    public class WrongInputMessage: Action
     {
-        public void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
+        public override void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
         {
             bot.SendTextMessageAsync(ev.Message.Chat.Id, "Это не похоже на строку расходов или команду :(");
         }

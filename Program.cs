@@ -13,7 +13,8 @@ namespace sucks_bucks_bot
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            var bot = new BotController();
+            const string Token = "1658228507:AAEF11ujKdslj3MLs-opP-2vKWQMJCiO79M";
+            var bot = new BotController(Token);
 
             Console.ReadKey();
 

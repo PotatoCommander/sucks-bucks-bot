@@ -1,4 +1,5 @@
 ﻿using sucks_bucks_bot.BotLogic.Messages.Abstract;
+using sucks_bucks_bot.Model;
 using sucks_bucks_bot.Repository;
 using sucks_bucks_bot.Repository.CategoryRepos;
 using Telegram.Bot;
@@ -6,25 +7,21 @@ using Telegram.Bot.Args;
 
 namespace sucks_bucks_bot.BotLogic.Messages
 {
-    public class GetByCategoryAction: IAction
+    public class GetByCategoryAction: ActionWithDbInteract
     {
-        private ExpenseCategoryRepository _expenseCategoryRepository;
-        private ExpenseRepository _expenseRepository;
-
-        public GetByCategoryAction(ExpenseRepository expenseRepository, ExpenseCategoryRepository expenseCategoryRepository)
+        public GetByCategoryAction(DbFacade dbFacade) : base(dbFacade)
         {
-            _expenseRepository = expenseRepository;
-            _expenseCategoryRepository = expenseCategoryRepository;
         }
-        public void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
+
+        public override void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
         {
-            var list = _expenseRepository.GetAllExpensesOfUser(ev.Message.From.Id);
-            var cats = _expenseCategoryRepository.GetAll();
+            var list = RepoFacade.expenses.GetAllExpensesOfUser(ev.Message.From.Id);
+            var cats = RepoFacade.expenseCategories.GetAll();
             var str = "";
             var total = 0f;
             foreach (var item in cats)
             {
-                var listOfExpenses = _expenseRepository.GetByCategoryId(item.Id, list);
+                var listOfExpenses = RepoFacade.expenses.GetByCategoryId(item.Id, list);
                 if (listOfExpenses.Count <= 0) continue;
                 str = string.Concat(str, "Kатегория: [" + item.CategoryName + "]\n");
                 var sum = 0f;

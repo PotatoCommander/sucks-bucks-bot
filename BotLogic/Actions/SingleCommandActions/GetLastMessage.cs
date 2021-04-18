@@ -9,20 +9,16 @@ using Telegram.Bot.Args;
 
 namespace sucks_bucks_bot.BotLogic.Messages
 {
-    public class GetLastAction: IAction
+    public class GetLastAction: ActionWithDbInteract
     {
-        private readonly ExpenseRepository _expenseRepository;
-        private readonly IncomeRepository _incomeRepository;
-
-        public GetLastAction(ExpenseRepository expRepo, IncomeRepository incomeRepo)
+        public GetLastAction(DbFacade dbFacade) : base(dbFacade)
         {
-            _expenseRepository = expRepo;
-            _incomeRepository = incomeRepo;
         }
-        public void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
+
+        public override void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
         {
-            List<Transaction> list = new List<Transaction>(_expenseRepository.GetAllExpensesOfUser(ev.Message.From.Id));
-            list.AddRange(new List<Transaction>(_incomeRepository.GetAllExpensesOfUser(ev.Message.From.Id))); 
+            List<Transaction> list = new List<Transaction>(RepoFacade.expenses.GetAllExpensesOfUser(ev.Message.From.Id));
+            list.AddRange(new List<Transaction>(RepoFacade.incomes.GetAllExpensesOfUser(ev.Message.From.Id))); 
             list = (list.OrderByDescending(x => x.CreatedTime).ToList());
             int boundary = 10;
             if (list.Count < 10)

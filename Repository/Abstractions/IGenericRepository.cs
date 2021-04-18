@@ -3,7 +3,7 @@ using sucks_bucks_bot.Model;
 
 namespace sucks_bucks_bot.Repository.Abstractions
 {
-    public interface IRepository<T> where T: Entity
+    public interface IGenericRepository<T> where T: Entity
     {
         T GetById(int? id);
         List<T> GetAll();

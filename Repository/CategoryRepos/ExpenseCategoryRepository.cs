@@ -7,7 +7,7 @@ using sucks_bucks_bot.Repository.Abstractions;
 
 namespace sucks_bucks_bot.Repository.CategoryRepos
 {
-    public class ExpenseCategoryRepository : AbstractRepo<ExpenseCategory>, IRepository<ExpenseCategory>
+    public class ExpenseCategoryRepository : AbstractRepo<ExpenseCategory>, IGenericRepository<ExpenseCategory>
     {
         public  void CategoryUpdate(List<ExpenseCategory> categories)
         {
@@ -37,13 +37,13 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
             CreateConnection();
             var categoryList = new List<ExpenseCategory>();
 
-            var com = new SqlCommand("SelectAllExpenseCategories", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("SelectAllExpenseCategories", Connection) {CommandType = CommandType.StoredProcedure};
             var dataAdapter = new SqlDataAdapter(com);
             var dataTable = new DataTable();
 
-            connection.Open();
+            Connection.Open();
             dataAdapter.Fill(dataTable);
-            connection.Close();
+            Connection.Close();
 
             foreach (DataRow dr in dataTable.Rows)
             {
@@ -65,13 +65,13 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
         public bool Insert(ExpenseCategory entity)
         {
             CreateConnection();
-            var command = new SqlCommand("InsertExpenseCategory", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("InsertExpenseCategory", Connection) {CommandType = CommandType.StoredProcedure};
 
             AddCommandParameters(command, entity);
 
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }
@@ -79,26 +79,26 @@ namespace sucks_bucks_bot.Repository.CategoryRepos
         public bool Update(ExpenseCategory entity)
         {
             CreateConnection();
-            var command = new SqlCommand("UpdateExpenseCategories", connection) {CommandType = CommandType.StoredProcedure};
+            var command = new SqlCommand("UpdateExpenseCategories", Connection) {CommandType = CommandType.StoredProcedure};
             
             AddCommandParameters(command, entity);
             
-            connection.Open();
+            Connection.Open();
             var i = command.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return i >= 1;
         }
         public bool Delete(ExpenseCategory entity)
         {
             CreateConnection();
-            var com = new SqlCommand("DeleteExpenseCategoryById", connection) {CommandType = CommandType.StoredProcedure};
+            var com = new SqlCommand("DeleteExpenseCategoryById", Connection) {CommandType = CommandType.StoredProcedure};
 
             com.Parameters.AddWithValue("@Id", entity.Id);
 
-            connection.Open();
+            Connection.Open();
             var result = com.ExecuteNonQuery();
-            connection.Close();
+            Connection.Close();
 
             return result >= 1;
         }

@@ -6,11 +6,11 @@ using sucks_bucks_bot.Model;
 
 namespace sucks_bucks_bot.BotLogic
 {
-    public class CategoryJSON
+    public class CategoryJson
     {
-        public string categoryName;
-        public string aliases;
-        public bool isBaseExpense;
+        public string CategoryName;
+        public string Aliases;
+        public bool IsBaseExpense;
     }
     public class JsonConfigure
     {
@@ -20,29 +20,29 @@ namespace sucks_bucks_bot.BotLogic
         {
             _filepath = filepath;
         }
-        public List<CategoryJSON> ParseJson()
+        public List<CategoryJson> ParseJson()
         {
-            var deserialized = JsonConvert.DeserializeObject<List<CategoryJSON>>(File.ReadAllText(_filepath));
+            var deserialized = JsonConvert.DeserializeObject<List<CategoryJson>>(File.ReadAllText(_filepath));
 
             return deserialized;
         }
 
-        public void ToJson(List<CategoryJSON> categories)
+        public void ToJson(List<CategoryJson> categories)
         {
             var serialized = JsonConvert.SerializeObject(categories,
                 new JsonSerializerSettings {Formatting = Formatting.Indented});
             File.WriteAllTextAsync(_filepath, serialized);
         }
-        private List<ExpenseCategory> GenerateCategories(List<CategoryJSON> categories)
+        private List<ExpenseCategory> GenerateCategories(List<CategoryJson> categories)
         {
             var list = new List<ExpenseCategory>();
             foreach (var item in categories)
             {
                 list.Add(new ExpenseCategory()
                 {
-                    CategoryName = item.categoryName,
-                    Aliases = item.aliases,
-                    IsBaseExpense = item.isBaseExpense,
+                    CategoryName = item.CategoryName,
+                    Aliases = item.Aliases,
+                    IsBaseExpense = item.IsBaseExpense,
                     Id = Guid.NewGuid().GetHashCode()
                 });
             }

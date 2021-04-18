@@ -1,21 +1,20 @@
 ﻿using sucks_bucks_bot.BotLogic.Messages.Abstract;
+using sucks_bucks_bot.Model;
 using sucks_bucks_bot.Repository;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
 namespace sucks_bucks_bot.BotLogic.Messages
 {
-    public class GetAllTransactionsAction: IAction
+    public class GetAllTransactionsAction: ActionWithDbInteract
     {
-        private ExpenseRepository _expenseRepository;
-
-        public GetAllTransactionsAction(ExpenseRepository expenseRepository)
+        public GetAllTransactionsAction(DbFacade dbFacade) : base(dbFacade)
         {
-            _expenseRepository = expenseRepository;
         }
-        public void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
+
+        public override void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
         {
-            var list = _expenseRepository.GetAllExpensesOfUser(ev.Message.From.Id);
+            var list = RepoFacade.expenses.GetAllExpensesOfUser(ev.Message.From.Id);
             var str = "Все расходы:\n";
             foreach (var item in list)
             {

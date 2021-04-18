@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using sucks_bucks_bot.BotLogic.Messages.Abstract;
+using sucks_bucks_bot.Model;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 
 namespace sucks_bucks_bot.BotLogic.Messages
 {
-    public class StartAction: IAction
+    public class StartAction: Action
     {
         private readonly List<string> _commands = new List<string>()
         {
@@ -17,7 +18,8 @@ namespace sucks_bucks_bot.BotLogic.Messages
             "/getbudget - информация о бюджете",
             "/setincome - Добавить прибыль"
         };
-        public void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
+
+        public override void SendMessage(MessageEventArgs ev, ITelegramBotClient bot)
         {
             bot.SendTextMessageAsync(ev.Message.Chat.Id,
                 "Вас приветсвует чат бот для учета расходов!\n" + "Вот список команд:");

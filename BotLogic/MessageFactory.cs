@@ -6,48 +6,44 @@ using sucks_bucks_bot.Repository;
 using sucks_bucks_bot.Repository.CategoryRepos;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Action = sucks_bucks_bot.BotLogic.Messages.Abstract.Action;
 
 namespace sucks_bucks_bot.BotLogic
 {
     public class MessageFactory
     {
-        public BudgetRepository budgets { get; set; }
-        public ExpenseCategoryRepository _expenseCategories { get; set; }
-        public IncomeCategoryRepository _incomeCategoryRepository { get; set; }
-        public ExpenseRepository _expenses { get; set; }
-        public IncomeRepository _incomes { get; set; }
-        public UserRepository _users { get; set; }
+        private ITelegramBotClient _bot;
+        private DbFacade _dbFacade;
 
-        public ITelegramBotClient _bot;
-
-        public MessageFactory(ITelegramBotClient bot)
+        public MessageFactory(ITelegramBotClient bot, DbFacade dbFacade)
         {
             _bot = bot;
+            _dbFacade = dbFacade;
         }
 
-        public IAction ShowMessageByCommand(MessageEventArgs ev)
+        public Action ShowMessageByCommand(MessageEventArgs ev)
         {
-            if (_users.GetById(ev.Message.From.Id) == null) return new InitUserAction(_users);
+            if (_dbFacade.users.GetById(ev.Message.From.Id) == null) return new InitUserAction(_dbFacade);
             switch (ev.Message.Text?.ToLowerInvariant())
             {
                 case "/start":
                     return new StartAction();
                 case "/getlast":
-                    return new GetLastAction(_expenses, _incomes);
+                    return new GetLastAction(_dbFacade);
                 case "/getall":
-                    return new GetAllTransactionsAction(_expenses);
+                    return new GetAllTransactionsAction(_dbFacade);
                 case "/bycategory":
-                    return new GetByCategoryAction(_expenses, _expenseCategories);
+                    return new GetByCategoryAction(_dbFacade);
                 case "/setup_budget":
                 default:
                     if (MessageParser.IsExpenseString(ev.Message.Text))
                     {
-                        return new AddingExpenseMessage(_expenses, _expenseCategories);
+                        return new AddingExpenseMessage(_dbFacade);
                     }
                     
                     if (MessageParser.IsIncomeString(ev.Message.Text))
                     {
-                        return new AddingIncomeMessage(_incomes, _incomeCategoryRepository);
+                        return new AddingIncomeMessage(_dbFacade);
                     }
                     
                     return new WrongInputMessage();
